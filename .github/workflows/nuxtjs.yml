@@ -7,7 +7,7 @@ name: Deploy Nuxt site to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main", "gh-pages"]
+    branches: ["gh-pages"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -71,7 +71,10 @@ jobs:
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: Generate with GitHub Pages preset
-        run: NUXT_APP_BASE_URL=/3D-solar-system-nuxt-three.js/ npx nuxi build --preset github_pages
+      #  run: NUXT_APP_BASE_URL=/3D-solar-system-nuxt-three.js/ npx nuxi build --preset github_pages
+        run: npx nuxt build --preset github_pages
+        env:
+          NUXT_APP_BASE_URL: /3D-solar-system-nuxt-three.js/
       # - name: Static HTML export with Nuxt
       #   run: ${{ steps.detect-package-manager.outputs.manager }} run generate
       - name: Upload artifact
