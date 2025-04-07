@@ -85,6 +85,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Generate with GitHub Pages preset
+        run: NUXT_APP_BASE_URL=/3D-solar-system-nuxt-three.js/ npx nuxi build --preset github_pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
