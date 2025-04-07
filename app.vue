@@ -2,6 +2,7 @@
 import { PerspectiveCamera, WebGLRenderer } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 const { app } = useRuntimeConfig()
+console.log(app, `${app.baseURL}models/mercury/scene.gltf`)
 const planetsData = [
   {
     name: 'Mercure',
