@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   ssr: false,
   app: {
-    baseURL: process.env.NUXT_APP_BASE_URL || '/',
+    baseURL: process.env.NODE_ENV === 'production' ? '/3D-solar-system-nuxt-three.js/' : '/',
   },
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
