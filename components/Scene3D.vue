@@ -3,12 +3,13 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 const { app } = useRuntimeConfig()
 const props = defineProps(['planetsData', 'renderer']);
+const emit = defineEmits(['modelsLoadingComplete'])
 const camera = defineModel('camera');
 const controls = defineModel('controls');
 const planetGroups = defineModel('planetGroups');
 
 const orbitIsPaused = ref(false); // Orbit pause flag
-onMounted(() => {
+onMounted(async () => {
   camera.value.position.set(10000, 50, 50);
   // Activer l'inertie
   controls.value.enableDamping = true;
@@ -166,30 +167,27 @@ onMounted(() => {
   };
 
   // Fonction pour charger tous les modèles
-  const loadPlanets = () => {
-    let planetsLoaded = 0;
-    props.planetsData.forEach((data) => {
-      loader.load(
-        data.path,
-        (gltf) => {
-          // Une fois le modèle chargé, créer la planète et l'ajouter à la scène
-          const planetGroup = createPlanet(data, gltf);
-          planetGroups.value.push(planetGroup);
-          // scene.add(planetGroup);
-
-          // Vérifier si tous les modèles sont chargés
-          planetsLoaded++;
-          if (planetsLoaded === props.planetsData.length) {
-            animate(); // Lancer l'animation lorsque toutes les planètes sont chargées
-          }
-        },
-        undefined,
-        (error) => {
-          console.error('Erreur lors du chargement du modèle : ', error);
-        },
-      );
-    });
-  };
+  const loadPlanets = async () => {
+    const promises = props.planetsData.map((data) =>
+      new Promise((resolve, reject) => {
+        loader.load(
+          data.path,
+          (gltf) => {
+            // Une fois le modèle chargé, créer la planète et l'ajouter à la scène
+            const planetGroup = createPlanet(data, gltf);
+            planetGroups.value.push(planetGroup);
+            resolve(gltf)
+          },
+          undefined,
+          (error) => {
+            console.error('Erreur lors du chargement du modèle : ', error);
+            reject(error)
+          },
+        );
+      })
+    )
+    await Promise.all(promises)
+  }
 
   function resizeRendererToDisplaySize(props) {
     const canvas = props.renderer.domElement;
@@ -428,13 +426,17 @@ onMounted(() => {
 
   const asteroidBelt = createAsteroidBelt();
   const kuiperBelt = createKuiperBelt();
-  loadPlanets();
+  await loadPlanets()
+  emit('modelsLoadingComplete')
+  animate()
 });
 </script>
 
 <template>
-  <div class="absolute left-1/2 -translate-x-1/2 bottom-10 bg-white p-5 rounded-full">
-    <img class="cursor-pointer" @click="orbitIsPaused = !orbitIsPaused" src="/assets/icons/pause.svg" />
+  <div>
+    <div class="absolute left-1/2 -translate-x-1/2 bottom-10 bg-white p-5 rounded-full">
+      <img class="cursor-pointer" @click="orbitIsPaused = !orbitIsPaused" src="/assets/icons/pause.svg" />
+    </div>
   </div>
 </template>
 

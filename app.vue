@@ -2,7 +2,7 @@
 import { PerspectiveCamera, WebGLRenderer } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 const { app } = useRuntimeConfig()
-console.log(app, `${app.baseURL}models/mercury/scene.gltf`)
+const loading = ref(true)
 const planetsData = [
   {
     name: 'Mercure',
@@ -170,8 +170,9 @@ onMounted(() => {
 </script>
 <template>
   <div>
+    <Loading v-if="loading" />
     <Scene3D v-if="controls" :planets-data="planetsData" :renderer="renderer" v-model:camera="camera"
-      v-model:controls="controls" v-model:planet-groups="planetGroups" />
+      v-model:controls="controls" v-model:planet-groups="planetGroups" @modelsLoadingComplete="loading = false" />
     <SelectPlanet :planet-groups="planetGroups" :camera="camera" :controls="controls" v-model="selectedPlanet" />
   </div>
 </template>
